@@ -1,0 +1,23 @@
+{
+  "name": "steam-api",
+  "version": "1.0.0",
+  "description": "Basic server with steam api keys.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/typicalmike002/steam-api.git"
+  },
+  "keywords": [
+    "nodejs",
+    "expressjs",
+    "steamapi"
+  ],
+  "author": "typicalmike002",
+  "bugs": {
+    "url": "https://github.com/typicalmike002/steam-api/issues"
+  },
+  "homepage": "https://github.com/typicalmike002/steam-api#readme"
+}
