@@ -1,90 +1,68 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
+// Module Dependencies
 var app = require('../app');
 var debug = require('debug')('steam-api:server');
 var http = require('http');
+var colors = require('colors/safe');
+var ip = require('ip');
 
-/**
- * Get port from environment and store in Express.
- */
-
+// Get port from environment and store in Express.
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
+// Create HTTP server.
 var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
+// Listen on provided port, on all network interfaces.
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-/**
- * Normalize a port into a number, string, or false.
- */
-
+// Normalize a port into a number, string, or false.
 function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
+    let portInt = parseInt(val, 10);
+    return isNaN(portInt) ? val : portInt || false; 
 }
 
-/**
- * Event listener for HTTP server "error" event.
- */
+// Function for error messages.
+function onError(err) {
+    if (err.syscall !== 'listen') {
+        throw err;
+    }
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    let bind = typeof port === 'string'
+        ? 'Pipe ' + port 
+        : 'Port ' + port;
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // handle specific listening errors with friendly messages.
+    switch (err.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+        break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+        break;
+        default:
+            throw err;
+    }
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
-
+// Function for when the server begins listening
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+    let addr = server.address();
+    let bind = typeof addr === 'string'
+        ? 'Pipe ' + addr
+        : 'Port ' + addr.port;
+    debug('Listening on ' + bind);
+
+    // Display a friendly message in the console indicating the server has started:
+    console.log(''
+        + 'steam-api is listening on '
+        + colors.green('http://' + ip.address() + ':' + app.get('port'))
+        + ' in ' + colors.yellow(app.get('env')) + ' mode.\n'
+    );
 }
+
