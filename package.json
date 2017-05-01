@@ -11,6 +11,11 @@
     "colors": "1.1.2",
     "express": "4.15.2",
     "ip": "1.1.5",
-    "request": "2.81.0"
+    "request": "2.81.0",
+    "steam-client": "2.2.2",
+    "steam-totp": "1.4.0",
+    "steam-tradeoffer-manager": "2.7.1",
+    "steam-user": "3.19.1",
+    "winston": "2.3.1"
   }
 }
