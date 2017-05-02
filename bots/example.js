@@ -10,7 +10,7 @@ const TradeOfferManager = require('steam-tradeoffer-manager');
 var manager;
 
 client.on('loggedOn', (details) => {
-    console.log('example.js has logged into Steam as ' + client.steamID);
+    console.log('example.js has logged in with SteamID: ' + client.steamID);
 
     // client has to be successfully logged on first for TradeOfferManager to work:
     manager = new TradeOfferManager({
@@ -22,8 +22,13 @@ client.on('loggedOn', (details) => {
     });
 });
 
+client.on('webSession', (session, cookies) => {
+    console.log('example.js has started a web session with ID: ' + session);
+    manager.setCookies(cookies);
+});
+
 client.on('error', (err) => {
-    console.log('example.js has return an error. ' + err);
+    console.error('example.js has return an error. ' + err);
     process.exit(1);
 });
 
@@ -33,6 +38,8 @@ module.exports = {
             if (err) {
                 throw new Error(err); 
             }
+            console.log('sussess');
+            console.log(inventory);
             return {
                 inventory: inventory,
                 currencies: currencies
