@@ -1,10 +1,9 @@
 const SteamUser = require('steam-user');
 const client = new SteamUser();
+const clientCreds = require('./example.creds.json');
+const crypto = require('crypto');
 
-client.logOn({
-    accountName: 'typicalmike002',
-    password: 'M237283274l!'
-});
+client.logOn(clientCreds);
 
 const TradeOfferManager = require('steam-tradeoffer-manager');
 var manager;
