@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./utils/startServer.js && node ./bin/www",
     "debug": "DEBUG=steam-api:server,express* npm start",
-    "addSteamAccount": "node ./utils/addBot.js"
+    "addBot": "node ./utils/addBot.js"
   },
   "dependencies": {
     "colors": "1.1.2",
