@@ -68,7 +68,6 @@ Bot.prototype.inputBotCredentials = function() {
  *
  * - Prompts the user for the bot's steam account user name.
  */
-
 function setName(newName) {
     bot.name = newName;
     rl.question(''

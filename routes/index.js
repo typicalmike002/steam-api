@@ -1,23 +1,13 @@
 const express = require('express');
 const request = require('request');
 const router = express.Router();
-const bot = require('../bots/example');
+const Bot = require('../bots/Bot');
 
-// application IDs for steam games:
-var appID = {
-    TF2: 440,
-    DOTA2: 570,
-    CSGO: 730,
-    Steam: 753
-};
+var bots = {
+    example: new Bot('example')
+}
 
-// (undocumented) context IDs for steam inventory lists:
-var contextID = {
-    TF2: 2,
-    DOTA2: 2,
-    CSGO: 2,
-    Steam: 6
-};
+bots.example.logIn();
 
 /**
  * root
@@ -34,7 +24,7 @@ router.get('/', (req, res, next) => {
 /**
  * /api/profile/:steamID?key=YOURKEYGOESHERE
  *
- * gets the user's profile information.
+ * - gets the user's profile information.
  */
 router.get('/api/profile/:steamID', (req, res, next) => {
 
@@ -46,7 +36,6 @@ router.get('/api/profile/:steamID', (req, res, next) => {
             if (steamErr){ 
                 throw new Error(steamErr.message);
             }
-
             res.setHeader('Content-type', 'application/json');
             res.json(JSON.parse(steamBody));
         }
@@ -54,16 +43,24 @@ router.get('/api/profile/:steamID', (req, res, next) => {
 });
 
 /** 
- * /api/bot/inventory
+ * /bot/getInventory/:botname/:game
  * 
- * gets the example bot's inventory list.
+ * - Gets inventory items a bot is currently holding by game name.
+ *
+ * - params: botname  {name of the bot we want}
+ *           game     {the steam game of which to load the inventory of}
  */
-router.get('/api/bot/inventory', (req, res, next) => {
-    res.json({
-        message: bot.getBotInventory(appID.CSGO, contextID.CSGO)
+router.get('/bot/getInventory/:botname/:game', (req, res, next) => {
+
+    bots[req.params.botname].getInventoryByGameName(req.params.game, (err, inventory, currency, length) => {
+        if (err){ throw new Error(err); }
+
+        res.json({
+            inventory: inventory,
+            currency: currency,
+            length: length
+        });
     });
 });
-
-
 
 module.exports = router;

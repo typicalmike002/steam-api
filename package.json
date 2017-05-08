@@ -4,7 +4,7 @@
   "private": true,
   "entry": "index.js",
   "scripts": {
-    "start": "node ./utils/startServer.js && node ./bin/www",
+    "start": "node ./bin/www",
     "debug": "DEBUG=steam-api:server,express* npm start",
     "addBot": "node ./utils/addBot.js"
   },
