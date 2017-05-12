@@ -1,3 +1,10 @@
+/**
+ * Bot.js
+ *
+ * - Contains the main Bot class and both public and private functions.
+ */
+
+// Dependencies:
 const SteamUser = require('steam-user');
 const TradeOfferManager = require('steam-tradeoffer-manager');
 const crypto = require('crypto');
@@ -29,60 +36,38 @@ const contextIDs = {
 /**
  * Class Bot
  *
- * - Initalizes a bot by name. 
+ * - each bot name should match a .creds.json file
  */ 
 function Bot(name){
     this.name = name;
+    this.client = new SteamUser();
+    this.manager = undefined;
+    this.callBack = function(){};
+
+    let onLoggedIn = emitOnLoggedOn.bind(this);
+    let onWebSession = emitOnWebSession.bind(this);
+    let onError = emitOnError.bind(this);
+
+    this.client.on('loggedOn', onLoggedIn);
+    this.client.on('webSession', onWebSession);
+    this.client.on('error', onError); 
 }
 
 
 /** 
- * Method logIn()
+ * Method logIn(callBack)
  *
  * - Uses the name property to get the bot's steam user credentials from .creds.json file.
- *
- * - Initalizes all of the bot's functionality.
  */
-Bot.prototype.logIn = function(){
+Bot.prototype.logIn = function(callBack){
+
+    this.callBack = callBack;
+    let onSubmit = onSecretSubmit.bind(this);
     
     // Query for secret then process it to unencrypt password:
-    rl.question('Please enter the secret key for ' + this.name + '\n', (secret) => { 
-        
-        // Decrypt the bot's password:
-        let creds = require('./' + this.name + '.creds.json');
-        creds.password = deCryptPassword(creds.password, secret);
-
-        // Log the bot into steam:
-        this.client = new SteamUser();
-        this.client.logOn(creds);
-
-        // Initializes the manager once the bot is connected.
-        this.client.on('loggedOn', (details) => {
-            console.log( this.name + ' has logged in with SteamID: ' + this.client.steamID);
-
-            // client has to be successfully logged on first for TradeOfferManager to work:
-            this.manager = new TradeOfferManager({
-                steam: this.client,
-                domain: "gmail.com",
-                language: "en", // english item description.
-                pollInterval: 10000, // poll steam every 10 seconds.
-                cancelTime: 30000 // Expire any outgoing trade offers that have been up for 5+ minutes.
-            });
-        });
-
-        // Sets the manager's cookies once a web session has been established:
-        this.client.on('webSession', (session, cookies) => {
-            console.log(this.name + ' has started a web session with ID: ' + session);
-            this.manager.setCookies(cookies);
-        });
-
-        // Prints a stacktrace of the err to the console and exit.
-        this.client.on('error', (err) => {
-            console.error(this.name + ' has return an error. ' + err);
-            process.exit(1);
-        });     
-    });
+    rl.question('Please enter the secret key for ' + this.name + '\n', onSubmit);
 }
+
 
 /**
  * Method getInventoryByGameName(gameName, callBack)
@@ -115,6 +100,27 @@ Bot.prototype.getInventoryByGameName = function(gameName, callBack) {
 }
 
 
+// Exports all bot functionality.
+module.exports = Bot;
+
+
+// Private Functions listed below:
+
+/**
+ * Function onSecretSubmit(secret)
+ *
+ * - Callback executed when user finishes inputting a
+ *   secret key for unencrypting the steam account password.
+ */
+function onSecretSubmit(secret){
+    // Decrypt the bot's password using the secret:
+    let creds = require('./creds/' + this.name + '.creds.json');
+    creds.password = deCryptPassword(creds.password, secret);
+    this.client.logOn(creds);
+    creds.password = undefined; // Not entirely sure this is needed.
+}
+
+
 /** 
  * Function deCryptPassword(password, secret)
  *
@@ -130,5 +136,47 @@ function deCryptPassword(password, secret) {
 }
 
 
-// Export all bot functionality: 
-module.exports = Bot;
+/**
+ * Function emitOnLoggedOn(details)
+ *
+ * - Callback that executes when a bot logs in.
+ */
+function emitOnLoggedOn(details){
+    console.log( this.name + ' has logged in with SteamID: ' + this.client.steamID);
+
+    // client has to be successfully logged on first for TradeOfferManager to work:
+    this.manager = new TradeOfferManager({
+        steam: this.client,
+        domain: "gmail.com",
+        language: "en", // english item description.
+        pollInterval: 10000, // poll steam every 10 seconds.
+        cancelTime: 30000 // Expire any outgoing trade offers that have been up for 5+ minutes.
+    });
+
+    // Executes callback passed to login:
+    this.callBack();
+}
+
+
+/**
+ * Function emitOnWebSession(session, cookies)
+ *
+ * - Callback that executes once a bot has 
+ *   successfully created a websession with Steam.
+ */
+function emitOnWebSession(session, cookies) {
+    console.log(this.name + ' has started a web session with ID: ' + session);
+    this.manager.setCookies(cookies);
+}
+
+
+/**
+ * Function emitOnError(err)
+ *
+ * - Callback for bot error handler.
+ */
+function emitOnError(err) {
+    console.error(this.name + ' has return an error. ' + err);
+    process.exit(1);
+}
+

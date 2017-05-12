@@ -147,7 +147,7 @@ function encryptPassword(password, secret) {
  * - These credentials are used by the bot to access steam.
  */
 function writeBot(botName, userName, password) {
-    fs.writeFile('bots/' + botName + '.creds.json', '' 
+    fs.writeFile('bots/creds/' + botName + '.creds.json', '' 
         + '{\n'
             + '\t"accountName":' + '"' + userName + '",\n'
             + '\t"password":' + '"' + password + '"\n'

@@ -1,13 +1,8 @@
 const express = require('express');
 const request = require('request');
 const router = express.Router();
-const Bot = require('../bots/Bot');
+const bots = require('../utils/startBots');
 
-var bots = {
-    example: new Bot('example')
-}
-
-bots.example.logIn();
 
 /**
  * root
